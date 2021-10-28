@@ -40,6 +40,17 @@ ARCHITECTURE Behavioral OF vga_top IS
         );
     END COMPONENT;
     
+    COMPONENT boxpos is
+        PORT (
+            pixel_row : IN std_logic_vector (10 DOWNTO 0);
+            pixel_col : IN std_logic_vector (10 DOWNTO 0);
+            boxX : OUT integer;
+            boxY : OUT integer;
+            pixX : OUT integer;
+            pixY : OUT integer
+            );
+    END COMPONENT;
+    
     component clk_wiz_0 is
     port (
       clk_in1  : in std_logic;
@@ -49,8 +60,13 @@ ARCHITECTURE Behavioral OF vga_top IS
     SIGNAL colorOut : std_logic_vector(7 DOWNTO 0);
     SIGNAL COUNT : std_logic_vector(7 DOWNTO 0);
     CONSTANT A : std_logic_vector(63 DOWNTO 0) := "0001100000100100010000100100001001111110010000100100001001000010";
-    SIGNAL pixel : std_logic_vector(7 DOWNTO 0);
-    SIGNAL N : integer := 0;
+    
+
+    SIGNAL boxX : integer := 0;
+    SIGNAL boxY : integer := 0;
+    SIGNAL pX : integer := 0;
+    SIGNAL pY :integer := 0;
+    
 BEGIN 
     
     vga_driver : vga_sync
@@ -68,6 +84,16 @@ BEGIN
         pixel_row => pxX,
         pixel_col => pxY
     );
+    
+    positiondec : boxpos
+    PORT MAP(
+        pixel_row => pxX,
+        pixel_col => pxY,
+        boxX => boxX,
+        boxY => boxY,
+        pixX => pX,
+        pixY => pY
+    );
         
     clk_wiz_0_inst : clk_wiz_0
     port map (
@@ -80,10 +106,14 @@ BEGIN
     
     ispx : PROCESS (pxX, pxY) IS 
     BEGIN
-        if pxY(3 DOWNTO 0) = "000" or pxX(3 DOWNTO 0) = "000" then
-            colorOut <= "00000000";
-            else
+        if boxX = 5 and boxY = 5 then
             colorOut <= bitsIn;
+            else
+            if boxX = 10 and boxY = 10 then
+            colorOut <= bitsIn;
+            else
+            colorOut <= "00000000";
+        end if;
         end if;
     END PROCESS;
     
