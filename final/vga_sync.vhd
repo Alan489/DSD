@@ -5,9 +5,9 @@ USE IEEE.STD_LOGIC_UNSIGNED.ALL;
 ENTITY vga_sync IS
 	PORT (
 		pixel_clk : IN STD_LOGIC;
-		red_in    : IN STD_LOGIC;
-		green_in  : IN STD_LOGIC;
-		blue_in   : IN STD_LOGIC;
+		red_in    : IN std_logic_vector (2 DOWNTO 0);
+		green_in  : IN std_logic_vector (2 DOWNTO 0);
+		blue_in   : IN std_logic_vector (1 DOWNTO 0);
 		red_out   : OUT std_logic_vector (2 DOWNTO 0);
 		green_out : OUT std_logic_vector (2 DOWNTO 0);
 		blue_out  : OUT std_logic_vector (1 DOWNTO 0);
@@ -72,21 +72,9 @@ BEGIN
 		pixel_row <= v_cnt;
 		
 		if (video_on = '1') THEN
-            if (red_in = '1') then
-              red_out <= "111";
-            else
-              red_out <= "000";
-           end if;
-           if (green_in = '1') then
-              green_out <= "111";
-            else
-              green_out <= "000";
-           end if;
-		  if (blue_in = '1') then
-              blue_out <= "11";
-            else
-              blue_out <= "00";
-           end if;
+            red_out <= red_in;
+            green_out <= green_in;
+            blue_out <= blue_in;
 		else
 		  red_out <= "000";
 		  green_out <= "000";
@@ -96,4 +84,3 @@ BEGIN
 
 	END PROCESS;
 END Behavioral;
-

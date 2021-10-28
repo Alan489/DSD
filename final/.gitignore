@@ -1,0 +1,3 @@
+#Ignore all vivado generated files
+
+final.*
