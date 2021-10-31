@@ -40,6 +40,21 @@ ARCHITECTURE Behavioral OF vga_top IS
         );
     END COMPONENT;
     
+    component textMap IS
+        PORT (
+            BX : IN integer;
+            BY : IN integer;
+            OT : OUT integer
+        );
+     END component;
+    
+    component font is
+    Port ( 
+        char : IN integer;
+        bits : OUT std_logic_vector(63 DOWNTO 0)
+    );
+    end component; 
+    
     COMPONENT boxpos is
         PORT (
             pixel_row : IN std_logic_vector (10 DOWNTO 0);
@@ -59,8 +74,8 @@ ARCHITECTURE Behavioral OF vga_top IS
     end component;
     SIGNAL colorOut : std_logic_vector(7 DOWNTO 0);
     SIGNAL COUNT : std_logic_vector(7 DOWNTO 0);
-    CONSTANT A : std_logic_vector(63 DOWNTO 0) := "0001100000100100010000100100001001111110010000100100001001000010";
-    
+    SIGNAL A : std_logic_vector(63 DOWNTO 0) := "0011110001000010010000100100001001111100010000100100001001111100";
+    SIGNAL J : integer := 1;
 
     SIGNAL boxX : integer := 0;
     SIGNAL boxY : integer := 0;
@@ -68,6 +83,24 @@ ARCHITECTURE Behavioral OF vga_top IS
     SIGNAL pY :integer := 0;
     
 BEGIN 
+    positiondec : boxpos
+    PORT MAP(
+        pixel_row => pxX,
+        pixel_col => pxY,
+        boxX => boxX,
+        boxY => boxY,
+        pixX => pX,
+        pixY => pY
+    );
+    
+    getPX : textMap
+    PORT MAP(
+        BX => boxX,
+        BY => boxY,
+        OT => J
+        
+    
+    );
     
     vga_driver : vga_sync
     PORT MAP(
@@ -85,15 +118,14 @@ BEGIN
         pixel_col => pxY
     );
     
-    positiondec : boxpos
+    fontdecode : font
     PORT MAP(
-        pixel_row => pxX,
-        pixel_col => pxY,
-        boxX => boxX,
-        boxY => boxY,
-        pixX => pX,
-        pixY => pY
+         char => J,
+         bits => A
+        
     );
+    
+    
         
     clk_wiz_0_inst : clk_wiz_0
     port map (
@@ -106,15 +138,16 @@ BEGIN
     
     ispx : PROCESS (pxX, pxY) IS 
     BEGIN
-        if boxX = 5 and boxY = 5 then
-            colorOut <= bitsIn;
+        if A(63-(pY*8+pX) DOWNTO 63-(pY*8+pX)) = "1" then
+            if boxY = 0 then
+                colorOut <= "00011100";
             else
-            if boxX = 10 and boxY = 10 then
-            colorOut <= bitsIn;
-            else
+                colorOut <= "11101010";
+            end if;
+        else
             colorOut <= "00000000";
-        end if;
-        end if;
+        end if;        
+    
     END PROCESS;
     
     END Behavioral;
