@@ -12,15 +12,14 @@ ENTITY vga_top IS
         vga_blue  : OUT STD_LOGIC_VECTOR (1 DOWNTO 0);
         vga_hsync : OUT STD_LOGIC;
         vga_vsync : OUT STD_LOGIC;
-        bitsIn : IN std_logic_vector(7 DOWNTO 0)
+        bitsIn : IN std_logic_vector(7 DOWNTO 0);
+        input : IN std_logic
         
     );
 END vga_top;
 
 ARCHITECTURE Behavioral OF vga_top IS
-    SIGNAL pxl_clk : STD_LOGIC;
-    SIGNAL pxX : std_logic_vector(10 DOWNTO 0);
-    SIGNAL pxY : std_logic_vector(10 DOWNTO 0);
+   
     -- internal signals to connect modules
 
     COMPONENT vga_sync IS
@@ -72,17 +71,24 @@ ARCHITECTURE Behavioral OF vga_top IS
       clk_out1 : out std_logic
     );
     end component;
+    
     SIGNAL colorOut : std_logic_vector(7 DOWNTO 0);
     SIGNAL COUNT : std_logic_vector(7 DOWNTO 0);
     SIGNAL A : std_logic_vector(63 DOWNTO 0) := "0011110001000010010000100100001001111100010000100100001001111100";
     SIGNAL J : integer := 1;
-
+    SIGNAL pxl_clk : STD_LOGIC;
+    SIGNAL pxX : std_logic_vector(10 DOWNTO 0);
+    SIGNAL pxY : std_logic_vector(10 DOWNTO 0);
     SIGNAL boxX : integer := 0;
     SIGNAL boxY : integer := 0;
     SIGNAL pX : integer := 0;
     SIGNAL pY :integer := 0;
-    
+    SIGNAL cursor : integer := 0;
+    SIGNAL debounce : std_logic := '0';
+    SIGNAL S_vsync : std_logic;
 BEGIN 
+    
+    
     positiondec : boxpos
     PORT MAP(
         pixel_row => pxX,
@@ -133,11 +139,18 @@ BEGIN
       clk_out1 => pxl_clk
     );
     
+    
+    
+    
+    
+    
     -- Box number is (10 DOWNTO 4), px number is (3 DOWNTO 0)
     
     
-    ispx : PROCESS (pxX, pxY) IS 
+    ispx : PROCESS (pxX, pxY, cursor) IS 
     BEGIN
+    
+    --Code to pull text from the character map. Not used for cursor test.
         if A(63-(pY*8+pX) DOWNTO 63-(pY*8+pX)) = "1" then
             if boxY = 0 then
                 colorOut <= "00011100";
@@ -147,6 +160,10 @@ BEGIN
         else
             colorOut <= "00000000";
         end if;        
+    
+    
+    
+    
     
     END PROCESS;
     
