@@ -1,3 +1,11 @@
+--Alan Decowski
+--CPE 487
+--2021F
+--vga_sync.vhd
+
+--Updated Fall 2021. Now accepts four bits for all colors. Can now produce 4,096 colors instead of 256.
+--Updated lines marked with "updated" comment.
+
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.STD_LOGIC_UNSIGNED.ALL;
@@ -5,12 +13,12 @@ USE IEEE.STD_LOGIC_UNSIGNED.ALL;
 ENTITY vga_sync IS
 	PORT (
 		pixel_clk : IN STD_LOGIC;
-		red_in    : IN std_logic_vector (2 DOWNTO 0);
-		green_in  : IN std_logic_vector (2 DOWNTO 0);
-		blue_in   : IN std_logic_vector (1 DOWNTO 0);
-		red_out   : OUT std_logic_vector (2 DOWNTO 0);
-		green_out : OUT std_logic_vector (2 DOWNTO 0);
-		blue_out  : OUT std_logic_vector (1 DOWNTO 0);
+		red_in    : IN std_logic_vector (3 DOWNTO 0);--Updated 
+		green_in  : IN std_logic_vector (3 DOWNTO 0);--Updated 
+		blue_in   : IN std_logic_vector (3 DOWNTO 0);--Updated 
+		red_out   : OUT std_logic_vector (3 DOWNTO 0);--Updated 
+		green_out : OUT std_logic_vector (3 DOWNTO 0);--Updated 
+		blue_out  : OUT std_logic_vector (3 DOWNTO 0);--Updated 
 		hsync     : OUT STD_LOGIC;
 		vsync     : OUT STD_LOGIC;
 		pixel_row : OUT STD_LOGIC_VECTOR (10 DOWNTO 0);
@@ -70,15 +78,16 @@ BEGIN
 		END IF;
 		pixel_col <= h_cnt;
 		pixel_row <= v_cnt;
+
 		
 		if (video_on = '1') THEN
             red_out <= red_in;
             green_out <= green_in;
             blue_out <= blue_in;
 		else
-		  red_out <= "000";
-		  green_out <= "000";
-		  blue_out <= "00";
+		  red_out <= "0000";--Updated 
+		  green_out <= "0000";--Updated 
+		  blue_out <= "0000";--Updated 
 		end if;
 		-- Register video to clock edge and suppress video during blanking and sync periods
 
